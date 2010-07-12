@@ -8,6 +8,7 @@ class RBACMiddleware(object):
         else:
             request.subject = None
 
+
 def login_required(*args, **kwargs):
     """
     This function decorate a request in order to check if there is a user logged in.
