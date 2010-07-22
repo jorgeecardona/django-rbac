@@ -113,5 +113,6 @@ class Subject(models.Model):
         request.session['_rbac_subject'] = self
 
     def deauthenticate_request(self, request):
-        self.session.pop('_rbac_subject')
+#        request.session.pop('_rbac_subject')
+        request.session.flush()
         
