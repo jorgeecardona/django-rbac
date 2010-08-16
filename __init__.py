@@ -1,3 +1,15 @@
+
+# from django.conf import settings
+# import mongoengine as mongo
+
+# mongo.connect(
+#     'ubidots', 
+#     username='ubidots',
+#     password='ubidots',
+#     host='flame.mongohq.com',
+#     port=27073)
+
+
 from django.http import HttpResponseRedirect
 
 class RBACMiddleware(object):

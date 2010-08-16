@@ -1,4 +1,4 @@
-from django.db import models
+import mongoengine as mongo
 from django.utils import simplejson
 
 # Create your models here.
@@ -45,35 +45,8 @@ A role is just a job function or a title that define a subsets of subjects. It h
 
 """
 
-class NonImplementedException(Exception):
-    pass
+class Subject(object):
 
-class ListStringField(models.TextField):
-    
-    description = "A list of strings."
-
-    __metaclass__ = models.SubfieldBase
-
-    def __init__(self, *args, **kwargs):
-        if not ('default' in kwargs):
-            kwargs['default'] = simplejson.dumps([])
-
-        super(ListStringField, self).__init__(*args, **kwargs)
-    
-    def to_python(self, value):
-        if isinstance(value, list) and all([isinstance(x, (str, unicode)) for x in value]):
-            return value
-
-        value = simplejson.loads(value)
-        if isinstance(value, list) and all([isinstance(x, (str, unicode)) for x in value]):
-            return value
-        
-        return []
-        
-    def get_prep_value(self, value):
-        return simplejson.dumps(value)
-
-class Subject(models.Model):
     """
     Subject
     =======
@@ -81,28 +54,23 @@ class Subject(models.Model):
     This is an abstract class that define the minimum aspects 
     to be an agent in Role-Based Access Control.
 
-    It define a basic list of roles, this roles are basically identified with the name of the role.
-    
+    It define a basic list of roles, this roles are basically 
+    identified with the name of the role.
     """
 
-    class Meta(object):
-        abstract = True
-
-    roles = ListStringField()
+    #roles = 
 
     @classmethod
     def identify(cls, *args, **kwargs):
         """
         This method should receive the parameters needed to identify an agent.
-
-        In a single case wher agents are regular human beigns an username or email is fine.
         """
         raise NonImplementedException("Define an identification mechanism.")
     
     def authenticate(self, *args, **kwargs):
         raise NonImplementedException(
-            "Define an authentication mechanism, given an agent already identified.")
-        
+            "Define an authentication mechanism.")
+    
     def authorize(self, *args, **kwargs):
         raise NonImplementedException(
             "Define an authoization mechanism to perform transaction."
@@ -113,6 +81,4 @@ class Subject(models.Model):
         request.session['_rbac_subject'] = self
 
     def deauthenticate_request(self, request):
-#        request.session.pop('_rbac_subject')
         request.session.flush()
-        
